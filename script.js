@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const kofiLink = "https://ko-fi.com/yoko4012";
 
     // 2. 聚光灯效果 (Spotlight Effect)
-    // 通过更新 CSS 变量驱动径向渐变，避免繁重的 JS 重绘，保持 60fps
     const cards = document.querySelectorAll('.card');
     cards.forEach(card => {
         card.addEventListener('mousemove', (e) => {
@@ -34,11 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.classList.remove('active');
         modal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = ''; // 恢复背景滚动
-        // 延迟清空 src，避免关闭动画期间出现闪烁
         setTimeout(() => { modalImg.src = ''; }, 200); 
     };
 
-    // 使用事件委托处理所有二维码点击
     document.querySelectorAll('.qr-container').forEach(container => {
         container.addEventListener('click', () => {
             const targetId = container.getAttribute('data-modal-target');
@@ -46,10 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 点击模态框任意位置触发关闭
     modal.addEventListener('click', closeModal);
 
-    // 4. 复制功能逻辑 (增强型平滑反馈)
+    // 4. 复制功能逻辑
     if (copyBtn) {
         copyBtn.addEventListener('click', () => {
             navigator.clipboard.writeText(kofiLink).then(() => {
@@ -81,14 +77,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // 6. 平滑滚动入场动画 (Scroll Reveal)
     const observerOptions = {
         threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px' // 提前 50px 触发，体验更平滑
+        rootMargin: '0px 0px -50px 0px'
     };
 
     const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('active');
-                revealObserver.unobserve(entry.target); // 动画仅触发一次，节省性能
+                revealObserver.unobserve(entry.target);
             }
         });
     }, observerOptions);

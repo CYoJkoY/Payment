@@ -12,7 +12,6 @@
     --alipay-color: #1677ff;
     --kofi-color: #ff5e5b;
     
-    /* 聚光灯动态坐标变量 (由 JS 注入) */
     --mouse-x: 50%;
     --mouse-y: 50%;
 }
@@ -36,7 +35,6 @@ body {
     align-items: center;
     min-height: 100vh;
     padding: 3rem 1.5rem;
-    /* 极光脉动网格背景 */
     background-image: 
         radial-gradient(circle at 50% 50%, rgba(0, 255, 157, 0.04) 0%, transparent 60%),
         linear-gradient(rgba(0, 255, 157, 0.03) 1px, transparent 1px),
@@ -59,7 +57,6 @@ body {
     font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
 }
 
-/* 流光渐变标题 */
 .header h1 {
     font-size: 2rem;
     margin-bottom: 0.5rem;
@@ -115,7 +112,6 @@ body {
     max-width: 1000px;
 }
 
-/* 🌟 核心改进：为每种卡片注入专属主题色变量 */
 .card-wechat { --theme-color: var(--wechat-color); }
 .card-alipay { --theme-color: var(--alipay-color); }
 .card-kofi { --theme-color: var(--kofi-color); }
@@ -140,45 +136,43 @@ body {
     transform: translateY(-6px);
 }
 
-/* 🌟 核心改进：聚光灯内部光晕使用主题色 */
 .card::after {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     background: radial-gradient(
-        600px circle at var(--mouse-x) var(--mouse-y),
-        var(--theme-color, rgba(255, 255, 255, 0.08)), /* 默认微白，有主题色则用主题色 */
-        transparent 40%
+        800px circle at var(--mouse-x) var(--mouse-y),
+        var(--theme-color, rgba(255, 255, 255, 0.04)),
+        transparent 60%
     );
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 0.4s ease;
     pointer-events: none;
     border-radius: 16px;
     z-index: 1;
 }
 
-/* 🌟 核心改进：聚光灯动态发光边框使用主题色 */
 .card::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     border-radius: 16px;
-    padding: 1.5px; /* 略微加粗让颜色更明显 */
+    padding: 1px; 
     background: radial-gradient(
-        600px circle at var(--mouse-x) var(--mouse-y),
-        var(--theme-color, rgba(255, 255, 255, 0.6)),
-        transparent 40%
+        800px circle at var(--mouse-x) var(--mouse-y),
+        var(--theme-color, rgba(255, 255, 255, 0.25)),
+        transparent 60%
     );
-    mask:
-        linear-gradient(#fff 0 0) content-box, 
-        linear-gradient(#fff 0 0);
-    mask-composite: exclude;
     -webkit-mask: 
         linear-gradient(#fff 0 0) content-box, 
         linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
+    mask:
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    mask-composite: exclude;
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 0.4s ease;
     pointer-events: none;
     z-index: 2;
 }
@@ -188,30 +182,28 @@ body {
     opacity: 1;
 }
 
-/* 确保卡片内容在光晕层之上 */
 .card > * {
     position: relative;
     z-index: 3;
 }
 
-/* 🌟 核心改进：增强悬停时的彩色辉光叠加与内部微光 */
+/* 悬停时的外部辉光保持克制 */
 .card-wechat:hover { 
     border-color: var(--wechat-color);
-    box-shadow: 0 8px 32px rgba(7, 193, 96, 0.3), inset 0 0 20px rgba(7, 193, 96, 0.05); 
+    box-shadow: 0 8px 32px rgba(7, 193, 96, 0.15), inset 0 0 20px rgba(7, 193, 96, 0.03); 
 }
 .card-alipay:hover { 
     border-color: var(--alipay-color);
-    box-shadow: 0 8px 32px rgba(22, 119, 255, 0.3), inset 0 0 20px rgba(22, 119, 255, 0.05); 
+    box-shadow: 0 8px 32px rgba(22, 119, 255, 0.15), inset 0 0 20px rgba(22, 119, 255, 0.03); 
 }
 .card-kofi:hover { 
     border-color: var(--kofi-color);
-    box-shadow: 0 8px 32px rgba(255, 94, 91, 0.3), inset 0 0 20px rgba(255, 94, 91, 0.05); 
+    box-shadow: 0 8px 32px rgba(255, 94, 91, 0.15), inset 0 0 20px rgba(255, 94, 91, 0.03); 
 }
 
-/* 🌟 核心改进：悬停时图标和标题的色彩增强联动 */
 .card:hover .card-icon {
-    filter: drop-shadow(0 0 8px var(--theme-color));
-    transform: scale(1.1);
+    filter: drop-shadow(0 0 6px var(--theme-color));
+    transform: scale(1.05);
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -253,7 +245,7 @@ body {
 
 .qr-container:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 25px var(--theme-color, rgba(0, 255, 157, 0.3));
+    box-shadow: 0 0 25px var(--theme-color, rgba(0, 255, 157, 0.2));
 }
 
 .qr-container img {
@@ -272,7 +264,6 @@ body {
     color: var(--theme-color, var(--accent-color));
 }
 
-/* 按钮基础样式 */
 .btn {
     display: inline-block;
     padding: 0.75rem 1.5rem;
@@ -288,7 +279,6 @@ body {
     overflow: hidden;
 }
 
-/* 光泽扫过动画 (Shimmer Effect) */
 .shimmer-btn::before {
     content: '';
     position: absolute;
@@ -318,11 +308,10 @@ body {
 
 .btn-kofi:hover {
     background-color: #e04e4b;
-    box-shadow: 0 0 15px rgba(255, 94, 91, 0.4);
+    box-shadow: 0 0 15px rgba(255, 94, 91, 0.3);
     transform: translateY(-1px);
 }
 
-/* 🌟 核心改进：复制按钮悬停时与卡片主题色联动 */
 .btn-copy {
     background-color: var(--border-color);
     color: var(--text-primary);
@@ -334,7 +323,6 @@ body {
     background-color: rgba(255, 255, 255, 0.05);
     border-color: var(--theme-color);
     color: var(--theme-color);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
     transform: translateY(-1px);
 }
 
@@ -407,7 +395,7 @@ body {
     max-width: 80%;
     max-height: 80%;
     border-radius: 12px;
-    box-shadow: 0 0 40px rgba(0, 255, 157, 0.3);
+    box-shadow: 0 0 40px rgba(0, 255, 157, 0.2);
     background-color: #ffffff;
     padding: 24px;
     object-fit: contain;
@@ -423,9 +411,6 @@ body {
     100% { transform: scale(1); opacity: 1; }
 }
 
-/* =========================================
-6. 响应式微调 (Media Queries)
-========================================= */
 @media (max-width: 600px) {
     .header h1 { font-size: 1.5rem; }
     .grid-container { grid-template-columns: 1fr; }

@@ -4,71 +4,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Support My Mod - 赞助支持页面">
     <title>Support My Mod | 赞助支持</title>
-    <!-- 引入外部样式表 -->
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <header class="header">
-        <h1>Support My Mod | 赞助支持<span class="cursor"></span></h1>
+    <header class="header reveal">
+        <h1>Support My Mod <span class="cursor"></span></h1>
         <p>如果这个 Mod 为您带来了便利或乐趣，欢迎自愿打赏。<br>If this mod made your life easier or just brought you some fun, tips are
             always appreciated.</p>
         <p>您的支持是我持续更新和维护的最大动力。<br>Your support is what keeps me going and updating.</p>
     </header>
 
     <main class="grid-container">
-        <!-- 微信卡片 -->
-        <article class="card card-wechat">
-            <div class="card-icon" style="color: var(--wechat-color);">WeChat</div>
+        <!-- WeChat Card -->
+        <div class="card card-wechat reveal" style="--delay: 0.1s">
+            <div class="card-icon" style="color: var(--wechat-color)">WeChat</div>
             <h2>微信支付</h2>
             <p>支持微信余额</p>
-            <div class="qr-container" data-modal-target="wechat-qr">
-                <img id="wechat-qr" src="images/WechatPay.webp" alt="WeChat Pay QR Code" loading="lazy"
-                    decoding="async">
+            <div class="qr-container" data-modal-target="qr-wechat">
+                <img src="images/WechatPay.webp" alt="WeChat QR Code">
             </div>
             <span class="qr-hint">↑ 点击二维码可放大</span>
-        </article>
+        </div>
 
-        <!-- 支付宝卡片 -->
-        <article class="card card-alipay">
-            <div class="card-icon" style="color: var(--alipay-color);">Alipay</div>
+        <!-- Alipay Card -->
+        <div class="card card-alipay reveal" style="--delay: 0.2s">
+            <div class="card-icon" style="color: var(--alipay-color)">Alipay</div>
             <h2>支付宝</h2>
             <p>支持支付宝余额</p>
-            <div class="qr-container" data-modal-target="alipay-qr">
-                <img id="alipay-qr" src="images/AliPay.webp" alt="Alipay QR Code" loading="lazy" decoding="async">
+            <div class="qr-container" data-modal-target="qr-alipay">
+                <img src="images/AliPay.webp" alt="Alipay QR Code">
             </div>
             <span class="qr-hint">↑ 点击二维码可放大</span>
-        </article>
+        </div>
 
-        <!-- Ko-fi 卡片 -->
-        <article class="card card-kofi">
-            <div class="card-icon" style="color: var(--kofi-color);">Ko-fi</div>
+        <!-- Ko-fi Card -->
+        <div class="card card-kofi reveal" style="--delay: 0.3s">
+            <div class="card-icon" style="color: var(--kofi-color)">Ko-fi</div>
             <h2>International</h2>
             <p>Support via Credit Card or PayPal (No account needed)</p>
-            <a href="https://ko-fi.com/yoko4012" target="_blank" rel="noopener noreferrer" class="btn btn-kofi">
+            <a href="https://ko-fi.com/yoko4012" target="_blank" rel="noopener noreferrer"
+                class="btn btn-kofi shimmer-btn">
                 ☕ Buy me a coffee
             </a>
-            <button class="btn btn-copy" id="copy-btn">
-                📋 Copy Link
-            </button>
-            <p id="copy-feedback" class="copy-feedback">Copied!</p>
-        </article>
+            <button id="copy-btn" class="btn btn-copy shimmer-btn">📋 Copy Link</button>
+            <span id="copy-feedback" class="copy-feedback">Copied to clipboard!</span>
+        </div>
     </main>
 
-    <footer class="footer">
-        <p>感谢您支持独立开发。<br>Thank you for supporting independent development.</p>
-        <p>对所有自愿捐赠均深表感谢。<br>All voluntary donations are appreciated.</p>
+    <footer class="footer reveal" style="--delay: 0.4s">
+        <p>感谢您支持独立开发。
+            <br>Thank you for supporting independent development.
+        </p>
+        <p>对所有自愿捐赠均深表感谢。
+            <br>All voluntary donations are appreciated.
+        </p>
     </footer>
 
-    <!-- 模态框 -->
-    <div id="qr-modal" class="modal" role="dialog" aria-modal="true" aria-label="Enlarged QR Code" aria-hidden="true">
-        <img id="modal-img" src="" alt="Enlarged QR Code" decoding="async">
+    <!-- Modal -->
+    <div id="qr-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+        <img id="modal-img" src="" alt="Enlarged QR Code">
     </div>
 
-    <!-- 引入外部脚本，使用 defer 确保在 DOM 解析后执行 -->
-    <script src="script.js" defer></script>
+    <script src="script.js"></script>
 </body>
 
 </html>

@@ -141,9 +141,9 @@ body {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     background: radial-gradient(
-        800px circle at var(--mouse-x) var(--mouse-y),
-        var(--theme-color, rgba(255, 255, 255, 0.04)),
-        transparent 60%
+        600px circle at var(--mouse-x) var(--mouse-y),
+        color-mix(in srgb, var(--theme-color, #ffffff) 15%, transparent),
+        transparent 50%
     );
     opacity: 0;
     transition: opacity 0.4s ease;
@@ -157,18 +157,18 @@ body {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     border-radius: 16px;
-    padding: 1px; 
+    padding: 1px;
     background: radial-gradient(
-        800px circle at var(--mouse-x) var(--mouse-y),
-        var(--theme-color, rgba(255, 255, 255, 0.25)),
-        transparent 60%
+        600px circle at var(--mouse-x) var(--mouse-y),
+        color-mix(in srgb, var(--theme-color, #ffffff) 30%, transparent),
+        transparent 50%
     );
-    -webkit-mask: 
-        linear-gradient(#fff 0 0) content-box, 
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
         linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask:
-        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0) content-box,
         linear-gradient(#fff 0 0);
     mask-composite: exclude;
     opacity: 0;

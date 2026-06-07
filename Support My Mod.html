@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support My Mod | 赞助支持</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent-color: #00ff9d; /* 极客终端绿 */
+            --accent-hover: #00cc7d;
+            --wechat-color: #07c160;
+            --alipay-color: #1677ff;
+            --paypal-color: #003087;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        /* 极客风终端标题 */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .header h1::before {
+            content: "> ";
+            color: var(--text-secondary);
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 1.2em;
+            background-color: var(--accent-color);
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+            margin-left: 4px;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        /* 卡片网格布局 */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-color);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .card h2 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* 二维码样式 */
+        .qr-container {
+            width: 200px;
+            height: 200px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 1.5rem;
+            cursor: zoom-in;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qr-container:hover {
+            opacity: 0.9;
+        }
+
+        .qr-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-paypal {
+            background-color: var(--paypal-color);
+            color: white;
+        }
+
+        .btn-paypal:hover {
+            background-color: #0045b9;
+        }
+
+        .btn-copy {
+            background-color: var(--border-color);
+            color: var(--text-primary);
+            margin-top: 0.5rem;
+        }
+
+        .btn-copy:hover {
+            background-color: #454c56;
+        }
+
+        /* 底部 */
+        .footer {
+            margin-top: 4rem;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-align: center;
+            font-family: "JetBrains Mono", "Consolas", monospace;
+        }
+
+        /* 模态框 (放大二维码) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            cursor: zoom-out;
+        }
+
+        .modal img {
+            max-width: 80%;
+            max-height: 80%;
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(0, 255, 157, 0.2);
+            background-color: #ffffff;
+            padding: 24px;
+            object-fit: contain;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        /* 响应式微调 */
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.4rem; }
+            .grid-container { grid-template-columns: 1fr; }
+            .model img { max-width: 90%; padding: 16px;}
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <h1>Support My Mod | 赞助支持<span class="cursor"></span></h1>
+        <p>If this mod made your life easier or just brought you some fun, tips are always appreciated.<br>如果这个 Mod 为您带来了便利或乐趣，欢迎自愿打赏。<br><br>Your support is what keeps me going and updating.<br>您的支持是我持续更新和维护的最大动力。</p>
+    </header>
+
+    <main class="grid-container">
+        <!-- 微信卡片 -->
+        <div class="card">
+            <div class="card-icon" style="color: var(--wechat-color);">WeChat</div>
+            <h2>微信支付</h2>
+            <p>支持微信余额</p>
+            <div class="qr-container" onclick="openModal('wechat-qr')">
+                <img id="wechat-qr" src="images/WechatPay.webp" alt="WeChat Pay QR Code">
+            </div>
+            <span style="font-size: 0.8rem; color: var(--text-secondary);">↑ 点击二维码可放大</span>
+        </div>
+
+        <!-- 支付宝卡片 -->
+        <div class="card">
+            <div class="card-icon" style="color: var(--alipay-color);">Alipay</div>
+            <h2>支付宝</h2>
+            <p>支持支付宝余额</p>
+            <div class="qr-container" onclick="openModal('alipay-qr')">
+                <img id="alipay-qr" src="images/AliPay.webp" alt="Alipay QR Code">
+            </div>
+            <span style="font-size: 0.8rem; color: var(--text-secondary);">↑ 点击二维码可放大</span>
+        </div>
+
+        <!-- PayPal/Ko-fi 卡片 -->
+        <div class="card">
+            <div class="card-icon" style="color: #ff5e5b;">Ko-fi</div>
+            <h2>International</h2>
+            <p>Support via Credit Card or PayPal (No account needed)</p>
+            
+            <a href="https://ko-fi.com/yoko4012" target="_blank" class="btn btn-paypal" style="background-color: #ff5e5b;">
+                ☕ Buy me a coffee
+            </a>
+            
+            <button class="btn btn-copy" onclick="copyKoFiLink()">
+                📋 Copy Link
+            </button>
+            <p id="copy-feedback" style="font-size: 0.75rem; color: var(--accent-color); margin-top: 0.5rem; opacity: 0; transition: opacity 0.3s;">Copied!</p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>Thank you for supporting independent development.</p>
+        <p>All voluntary donations are appreciated.</p>
+    </footer>
+
+    <div id="qr-modal" class="modal" onclick="closeModal()">
+        <img id="modal-img" src="" alt="Enlarged QR Code">
+    </div>
+
+    <script>
+        const kofiLink = "https://ko-fi.com/yoko4012";
+
+        function openModal(imgId) {
+            const modal = document.getElementById('qr-modal');
+            const modalImg = document.getElementById('modal-img');
+            const srcImg = document.getElementById(imgId);
+            
+            modalImg.src = srcImg.src;
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('qr-modal').classList.remove('active');
+        }
+
+        function copyKoFiLink() {
+            navigator.clipboard.writeText(kofiLink).then(() => {
+                const feedback = document.getElementById('copy-feedback');
+                feedback.style.opacity = '1';
+                setTimeout(() => {
+                    feedback.style.opacity = '0';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape") {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

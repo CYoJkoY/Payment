@@ -1,0 +1,286 @@
+/* =========================================
+   1. CSS 变量定义 (Theme Variables)
+   ========================================= */
+:root {
+    --bg-color: #0d1117;
+    --card-bg: #161b22;
+    --border-color: #30363d;
+    --text-primary: #c9d1d9;
+    --text-secondary: #8b949e;
+    --accent-color: #00ff9d;
+    --wechat-color: #07c160;
+    --alipay-color: #1677ff;
+    --kofi-color: #ff5e5b;
+}
+
+/* =========================================
+   2. 基础重置与背景 (Reset & Base)
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    /* 极淡的科技感网格背景 */
+    background-image: 
+        linear-gradient(rgba(0, 255, 157, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 157, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+}
+
+/* =========================================
+   3. 布局与组件 (Layout & Components)
+   ========================================= */
+.header {
+    text-align: center;
+    margin-bottom: 3rem;
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+}
+
+.header h1 {
+    font-size: 1.8rem;
+    color: var(--accent-color);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 12px rgba(0, 255, 157, 0.4);
+}
+
+.header h1::before {
+    content: "> ";
+    color: var(--text-secondary);
+}
+
+.header p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.header p + p {
+    margin-top: 1rem;
+}
+
+.cursor {
+    display: inline-block;
+    width: 8px;
+    height: 1.2em;
+    background-color: var(--accent-color);
+    animation: blink 1s step-end infinite;
+    vertical-align: middle;
+    margin-left: 4px;
+    box-shadow: 0 0 8px var(--accent-color);
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 1000px;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    will-change: transform, box-shadow;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+}
+
+/* 定制化卡片悬停彩色辉光 (Neon Glow) */
+.card-wechat:hover { 
+    border-color: var(--wechat-color); 
+    box-shadow: 0 8px 32px rgba(7, 193, 96, 0.15);
+}
+.card-alipay:hover { 
+    border-color: var(--alipay-color); 
+    box-shadow: 0 8px 32px rgba(22, 119, 255, 0.15);
+}
+.card-kofi:hover { 
+    border-color: var(--kofi-color); 
+    box-shadow: 0 8px 32px rgba(255, 94, 91, 0.15);
+}
+
+.card-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+}
+
+.card h2 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.card p {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
+}
+
+.qr-container {
+    width: 200px;
+    height: 200px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 1.5rem;
+    cursor: zoom-in;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.qr-container:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(0, 255, 157, 0.25);
+}
+
+.qr-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.qr-hint {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    transition: color 0.2s;
+}
+
+.qr-container:hover + .qr-hint {
+    color: var(--accent-color);
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+}
+
+.btn-kofi {
+    background-color: var(--kofi-color);
+    color: white;
+}
+
+.btn-kofi:hover {
+    background-color: #e04e4b;
+    box-shadow: 0 0 15px rgba(255, 94, 91, 0.4);
+    transform: translateY(-1px);
+}
+
+.btn-copy {
+    background-color: var(--border-color);
+    color: var(--text-primary);
+    margin-top: 0.5rem;
+}
+
+.btn-copy:hover {
+    background-color: #454c56;
+    transform: translateY(-1px);
+}
+
+.copy-feedback {
+    font-size: 0.75rem;
+    color: var(--accent-color);
+    margin-top: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+    text-shadow: 0 0 8px rgba(0, 255, 157, 0.5);
+}
+
+.footer {
+    margin-top: 4rem;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    text-align: center;
+    font-family: "JetBrains Mono", "Consolas", monospace;
+}
+
+.footer p + p {
+    margin-top: 0.5rem;
+}
+
+/* =========================================
+   4. 模态框 (Modal)
+   ========================================= */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.modal.active {
+    display: flex;
+    opacity: 1;
+}
+
+.modal img {
+    max-width: 80%;
+    max-height: 80%;
+    border-radius: 12px;
+    box-shadow: 0 0 40px rgba(0, 255, 157, 0.3);
+    background-color: #ffffff;
+    padding: 24px;
+    object-fit: contain;
+    cursor: zoom-out;
+}
+
+/* 模态框图片弹出弹性动画 */
+.modal.active img {
+    animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes modalPop {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* =========================================
+   5. 响应式微调 (Media Queries)
+   ========================================= */
+@media (max-width: 600px) {
+    .header h1 { font-size: 1.4rem; }
+    .grid-container { grid-template-columns: 1fr; }
+    .modal img { max-width: 90%; padding: 16px; }
+}

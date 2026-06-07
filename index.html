@@ -5,68 +5,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Support My Mod | 赞助支持</title>
-    <link rel="stylesheet" href="style.css">
+    <!-- 引入 CSS 入口文件 -->
+    <link rel="stylesheet" href="css/main.css">
 </head>
 
 <body>
     <header class="header reveal">
         <h1>Support My Mod <span class="cursor"></span></h1>
-        <p>如果这个 Mod 为您带来了便利或乐趣，欢迎自愿打赏。
-            <br>If this mod made your life easier or just brought you some fun, tips are always appreciated.
-        </p>
-        <p>您的支持是我持续更新和维护的最大动力。
-            <br>Your support is what keeps me going and updating.
-        </p>
+        <p>如果这个 Mod 为您带来了便利或乐趣，欢迎自愿打赏。</p>
+        <p>If this mod made your life easier or just brought you some fun, tips are always appreciated.</p>
     </header>
 
     <main class="grid-container">
         <!-- WeChat Card -->
-        <div class="card card-wechat reveal" style="--delay: 0.1s">
-            <div class="card-icon" style="color: var(--wechat-color)">WeChat</div>
-            <h2>微信支付</h2>
-            <p>支持微信余额</p>
+        <article class="card card-wechat reveal" style="--delay: 0.1s">
+            <div class="card-icon">💬</div>
+            <h2>WeChat</h2>
+            <p>微信支付<br>支持微信余额</p>
             <div class="qr-container" data-modal-target="qr-wechat">
-                <img id="qr-wechat" src="images/WechatPay.webp" alt="WeChat QR Code">
+                <img id="qr-wechat" src="assets/WechatPay.webp" alt="WeChat QR Code">
             </div>
-            <span class="qr-hint">↑ 点击二维码可放大</span>
-        </div>
+            <p class="qr-hint">↑ 点击二维码可放大</p>
+        </article>
 
         <!-- Alipay Card -->
-        <div class="card card-alipay reveal" style="--delay: 0.2s">
-            <div class="card-icon" style="color: var(--alipay-color)">Alipay</div>
-            <h2>支付宝</h2>
-            <p>支持支付宝余额</p>
+        <article class="card card-alipay reveal" style="--delay: 0.2s">
+            <div class="card-icon">💠</div>
+            <h2>Alipay</h2>
+            <p>支付宝<br>支持支付宝余额</p>
             <div class="qr-container" data-modal-target="qr-alipay">
-                <img id="qr-alipay" src="images/AliPay.webp" alt="Alipay QR Code">
+                <img id="qr-alipay" src="assets/AliPay.webp" alt="Alipay QR Code">
             </div>
-            <span class="qr-hint">↑ 点击二维码可放大</span>
-        </div>
+            <p class="qr-hint">↑ 点击二维码可放大</p>
+        </article>
 
         <!-- Ko-fi Card -->
-        <div class="card card-kofi reveal" style="--delay: 0.3s">
-            <div class="card-icon" style="color: var(--kofi-color)">Ko-fi</div>
-            <h2>International</h2>
-            <p>Support via Credit Card or PayPal (No account needed)</p>
+        <article class="card card-kofi reveal" style="--delay: 0.3s">
+            <div class="card-icon">☕</div>
+            <h2>Ko-fi</h2>
+            <p>International<br>Support via Credit Card or PayPal</p>
             <a href="https://ko-fi.com/yoko4012" target="_blank" rel="noopener noreferrer"
                 class="btn btn-kofi shimmer-btn">
-                ☕ Buy me a coffee
+                Buy me a coffee
             </a>
-            <button id="copy-btn" class="btn btn-copy shimmer-btn">📋 Copy Link</button>
-            <span id="copy-feedback" class="copy-feedback">Copied to clipboard!</span>
-        </div>
+            <button id="copy-btn" class="btn btn-copy">📋 Copy Link</button>
+            <div id="copy-feedback" class="copy-feedback">Copied to clipboard!</div>
+        </article>
     </main>
 
-    <footer class="footer reveal" style="--delay: 0.4s">
-        <p>感谢您支持独立开发。Thank you for supporting independent development.</p>
-        <p>对所有自愿捐赠均深表感谢。All voluntary donations are appreciated.</p>
+    <footer class="footer reveal">
+        <p>感谢您支持独立开发。 Thank you for supporting independent development.</p>
+        <p>对所有自愿捐赠均深表感谢。 All voluntary donations are appreciated.</p>
     </footer>
 
     <!-- Modal -->
-    <div id="qr-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div id="qr-modal" class="modal" aria-hidden="true">
         <img id="modal-img" src="" alt="Enlarged QR Code">
     </div>
 
-    <script src="script.js"></script>
+    <!-- 引入聚合后的 JS 入口文件，必须指定 type="module" -->
+    <script type="module" src="js/main.js"></script>
 </body>
 
 </html>

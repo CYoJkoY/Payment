@@ -1,0 +1,100 @@
+/* =========================================
+   布局与容器 (Layout & Container)
+   ========================================= */
+.header {
+    text-align: center;
+    margin-bottom: 4rem;
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+}
+
+.header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(90deg, var(--accent-color), #00b8ff, var(--accent-color));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: textShine 4s linear infinite;
+}
+
+@keyframes textShine {
+    to { background-position: 200% center; }
+}
+
+.header h1::before {
+    content: "> ";
+    color: var(--text-secondary);
+    -webkit-text-fill-color: var(--text-secondary);
+}
+
+.header p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.header p + p {
+    margin-top: 1rem;
+}
+
+.cursor {
+    display: inline-block;
+    width: 8px;
+    height: 1.2em;
+    background-color: var(--accent-color);
+    animation: blink 1s step-end infinite;
+    vertical-align: middle;
+    margin-left: 4px;
+    box-shadow: 0 0 8px var(--accent-color);
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    width: 100%;
+    max-width: 1000px;
+}
+
+.footer {
+    margin-top: 4rem;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    text-align: center;
+    font-family: "JetBrains Mono", "Consolas", monospace;
+}
+
+.footer p + p {
+    margin-top: 0.5rem;
+}
+
+/* =========================================
+   滚动入场动画 (Scroll Reveal)
+   ========================================= */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.5, 0, 0, 1),
+                transform 0.8s cubic-bezier(0.5, 0, 0, 1);
+    transition-delay: var(--delay, 0s);
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* =========================================
+   响应式适配 (Responsive)
+   ========================================= */
+@media (max-width: 600px) {
+    .header h1 { font-size: 1.5rem; }
+    .grid-container { grid-template-columns: 1fr; }
+    .modal img { max-width: 90%; padding: 16px; }
+}

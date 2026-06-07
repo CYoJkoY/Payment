@@ -1,0 +1,77 @@
+.card-wechat { --theme-color: var(--wechat-color); }
+.card-alipay { --theme-color: var(--alipay-color); }
+.card-kofi { --theme-color: var(--kofi-color); }
+
+.card {
+    background-color: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover { transform: translateY(-6px); }
+
+/* 聚光灯效果伪元素 */
+.card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), color-mix(in srgb, var(--theme-color, #ffffff) 15%, transparent), transparent 50%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    border-radius: 16px;
+    z-index: 1;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    padding: 1px;
+    background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), color-mix(in srgb, var(--theme-color, #ffffff) 30%, transparent), transparent 50%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.card:hover::before, .card:hover::after { opacity: 1; }
+.card > * { position: relative; z-index: 3; }
+
+/* 悬停辉光 */
+.card-wechat:hover { border-color: var(--wechat-color); box-shadow: 0 8px 32px rgba(7, 193, 96, 0.15), inset 0 0 20px rgba(7, 193, 96, 0.03); }
+.card-alipay:hover { border-color: var(--alipay-color); box-shadow: 0 8px 32px rgba(22, 119, 255, 0.15), inset 0 0 20px rgba(22, 119, 255, 0.03); }
+.card-kofi:hover { border-color: var(--kofi-color); box-shadow: 0 8px 32px rgba(255, 94, 91, 0.15), inset 0 0 20px rgba(255, 94, 91, 0.03); }
+
+.card:hover .card-icon { filter: drop-shadow(0 0 6px var(--theme-color)); transform: scale(1.05); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.card:hover h2 { color: var(--theme-color); transition: color 0.3s ease; }
+
+.card-icon { font-size: 2rem; margin-bottom: 1rem; font-weight: bold; }
+.card h2 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+.card p { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.5rem; }
+
+.qr-container {
+    width: 200px; height: 200px; background-color: #ffffff; border-radius: 8px;
+    padding: 10px; margin-bottom: 1.5rem; cursor: zoom-in;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    display: flex; align-items: center; justify-content: center;
+}
+.qr-container:hover { transform: scale(1.05); box-shadow: 0 0 25px var(--theme-color, rgba(0, 255, 157, 0.2)); }
+.qr-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.qr-hint { font-size: 0.8rem; color: var(--text-secondary); transition: color 0.2s; }
+.qr-container:hover + .qr-hint { color: var(--theme-color, var(--accent-color)); }

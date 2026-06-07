@@ -78,7 +78,7 @@ body {
 .header h1::before {
     content: "> ";
     color: var(--text-secondary);
-    -webkit-text-fill-color: var(--text-secondary); /* 覆盖渐变 */
+    -webkit-text-fill-color: var(--text-secondary);
 }
 
 .header p {
@@ -115,7 +115,11 @@ body {
     max-width: 1000px;
 }
 
-/* 高级玻璃拟态与聚光灯卡片 */
+/* 🌟 核心改进：为每种卡片注入专属主题色变量 */
+.card-wechat { --theme-color: var(--wechat-color); }
+.card-alipay { --theme-color: var(--alipay-color); }
+.card-kofi { --theme-color: var(--kofi-color); }
+
 .card {
     background-color: var(--card-bg);
     backdrop-filter: blur(12px);
@@ -129,21 +133,21 @@ body {
     align-items: center;
     position: relative;
     overflow: hidden;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
     transform: translateY(-6px);
 }
 
-/* 聚光灯：内部光晕 */
+/* 🌟 核心改进：聚光灯内部光晕使用主题色 */
 .card::after {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     background: radial-gradient(
         600px circle at var(--mouse-x) var(--mouse-y),
-        rgba(255, 255, 255, 0.06),
+        var(--theme-color, rgba(255, 255, 255, 0.08)), /* 默认微白，有主题色则用主题色 */
         transparent 40%
     );
     opacity: 0;
@@ -153,19 +157,19 @@ body {
     z-index: 1;
 }
 
-/* 聚光灯：动态发光边框 (使用 mask-composite 实现) */
+/* 🌟 核心改进：聚光灯动态发光边框使用主题色 */
 .card::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     border-radius: 16px;
-    padding: 1px; /* 边框宽度 */
+    padding: 1.5px; /* 略微加粗让颜色更明显 */
     background: radial-gradient(
         600px circle at var(--mouse-x) var(--mouse-y),
-        rgba(255, 255, 255, 0.4),
+        var(--theme-color, rgba(255, 255, 255, 0.6)),
         transparent 40%
     );
-    mask: 
+    mask:
         linear-gradient(#fff 0 0) content-box, 
         linear-gradient(#fff 0 0);
     mask-composite: exclude;
@@ -190,10 +194,31 @@ body {
     z-index: 3;
 }
 
-/* 定制化卡片悬停彩色辉光叠加 */
-.card-wechat:hover { box-shadow: 0 8px 32px rgba(7, 193, 96, 0.15); }
-.card-alipay:hover { box-shadow: 0 8px 32px rgba(22, 119, 255, 0.15); }
-.card-kofi:hover { box-shadow: 0 8px 32px rgba(255, 94, 91, 0.15); }
+/* 🌟 核心改进：增强悬停时的彩色辉光叠加与内部微光 */
+.card-wechat:hover { 
+    border-color: var(--wechat-color);
+    box-shadow: 0 8px 32px rgba(7, 193, 96, 0.3), inset 0 0 20px rgba(7, 193, 96, 0.05); 
+}
+.card-alipay:hover { 
+    border-color: var(--alipay-color);
+    box-shadow: 0 8px 32px rgba(22, 119, 255, 0.3), inset 0 0 20px rgba(22, 119, 255, 0.05); 
+}
+.card-kofi:hover { 
+    border-color: var(--kofi-color);
+    box-shadow: 0 8px 32px rgba(255, 94, 91, 0.3), inset 0 0 20px rgba(255, 94, 91, 0.05); 
+}
+
+/* 🌟 核心改进：悬停时图标和标题的色彩增强联动 */
+.card:hover .card-icon {
+    filter: drop-shadow(0 0 8px var(--theme-color));
+    transform: scale(1.1);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.card:hover h2 {
+    color: var(--theme-color);
+    transition: color 0.3s ease;
+}
 
 .card-icon {
     font-size: 2rem;
@@ -228,7 +253,7 @@ body {
 
 .qr-container:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 25px rgba(0, 255, 157, 0.3);
+    box-shadow: 0 0 25px var(--theme-color, rgba(0, 255, 157, 0.3));
 }
 
 .qr-container img {
@@ -244,7 +269,7 @@ body {
 }
 
 .qr-container:hover + .qr-hint {
-    color: var(--accent-color);
+    color: var(--theme-color, var(--accent-color));
 }
 
 /* 按钮基础样式 */
@@ -260,7 +285,7 @@ body {
     cursor: pointer;
     width: 100%;
     position: relative;
-    overflow: hidden; /* 为光泽动画裁剪 */
+    overflow: hidden;
 }
 
 /* 光泽扫过动画 (Shimmer Effect) */
@@ -297,14 +322,19 @@ body {
     transform: translateY(-1px);
 }
 
+/* 🌟 核心改进：复制按钮悬停时与卡片主题色联动 */
 .btn-copy {
     background-color: var(--border-color);
     color: var(--text-primary);
     margin-top: 0.75rem;
+    border: 1px solid transparent;
 }
 
 .btn-copy:hover {
-    background-color: #454c56;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: var(--theme-color);
+    color: var(--theme-color);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
     transform: translateY(-1px);
 }
 

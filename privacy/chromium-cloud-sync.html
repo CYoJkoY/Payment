@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Privacy Policy for Chromium Cloud Sync.">
+  <title>Chromium Cloud Sync — Privacy Policy</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f7f8fa;
+      --surface: #ffffff;
+      --text: #202124;
+      --muted: #5f6368;
+      --border: #dadce0;
+      --link: #1a73e8;
+      --accent: #e8f0fe;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #202124;
+        --surface: #292a2d;
+        --text: #e8eaed;
+        --muted: #bdc1c6;
+        --border: #3c4043;
+        --link: #8ab4f8;
+        --accent: #303134;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.7 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main {
+      width: min(900px, calc(100% - 32px));
+      margin: 48px auto;
+      padding: 40px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, .06);
+    }
+    h1, h2 { line-height: 1.25; }
+    h1 { margin-top: 0; font-size: clamp(32px, 6vw, 46px); }
+    h2 { margin-top: 40px; font-size: 24px; }
+    p, li { color: var(--text); }
+    .meta {
+      margin: -8px 0 28px;
+      color: var(--muted);
+    }
+    .notice {
+      margin: 24px 0;
+      padding: 16px 18px;
+      border-radius: 12px;
+      background: var(--accent);
+      border: 1px solid var(--border);
+    }
+    a { color: var(--link); }
+    code {
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: var(--accent);
+    }
+    footer {
+      margin-top: 48px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+    }
+    @media (max-width: 640px) {
+      main {
+        width: min(100% - 16px, 900px);
+        margin: 8px auto;
+        padding: 24px;
+        border-radius: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Chromium Cloud Sync Privacy Policy</h1>
+    <p class="meta">Effective date: October 8, 2026</p>
+
+    <div class="notice">
+      <strong>Summary:</strong> Chromium Cloud Sync does not operate an analytics,
+      advertising, profiling, or unrelated user-data collection service. It only
+      accesses and transfers data required for synchronization, restoration, extension
+      inventory/recovery, and package backup features that the user explicitly enables.
+    </div>
+
+    <h2>1. Scope</h2>
+    <p>
+      This Privacy Policy applies to the Chromium Cloud Sync browser extension
+      ("Chromium Cloud Sync", "the extension") published by Yoko / CYoJkoY.
+      The extension is designed to synchronize selected Chromium browser state
+      across devices through a cloud provider selected and configured by the user.
+    </p>
+
+    <h2>2. Data the extension processes</h2>
+    <p>Depending on the features the user enables, the extension may process:</p>
+    <ul>
+      <li>
+        <strong>Browser state:</strong> HTTP(S) tab URLs and titles, tab order,
+        pinned and active state, window state, tab-group metadata, and bookmark
+        titles, URLs, hierarchy, and order.
+      </li>
+      <li>
+        <strong>Extension metadata:</strong> installed third-party extension IDs,
+        names, versions, enabled state, installation type, update information,
+        homepage information, and store links used for inventory and recovery.
+      </li>
+      <li>
+        <strong>Authentication information:</strong> credentials or tokens that
+        the user explicitly provides or authorizes for GitHub, WebDAV, and
+        Google Drive. These are stored in the browser profile for the configured
+        provider and are not intentionally included in synchronized browser-state
+        payloads.
+      </li>
+      <li>
+        <strong>Google Drive account information:</strong> when Google Drive is
+        connected, the extension may read the authorized account email address,
+        display name, and profile image URL so the connected account can be
+        identified in the settings interface.
+      </li>
+      <li>
+        <strong>User-selected package data:</strong> when the package-backup
+        feature is explicitly used, the extension may read CRX/ZIP files or
+        extension files from a directory selected by the user and upload those
+        files to the backup provider selected by the user.
+      </li>
+    </ul>
+
+    <h2>3. Why this data is processed</h2>
+    <p>
+      The data above is processed only to provide the extension's disclosed
+      functionality:
+    </p>
+    <ul>
+      <li>Synchronizing and restoring selected browser state across devices.</li>
+      <li>Synchronizing tab groups and bookmarks.</li>
+      <li>Maintaining an inventory of installed third-party extensions.</li>
+      <li>Helping the user find and recover missing extensions.</li>
+      <li>Creating and restoring user-requested extension package backups.</li>
+      <li>Authenticating the user to the cloud provider selected by the user.</li>
+    </ul>
+
+    <h2>4. Where data is sent</h2>
+    <p>
+      Chromium Cloud Sync does not send synchronized data to a Yoko-operated
+      analytics or application server. Data is transmitted only to the provider
+      that the user explicitly configures:
+    </p>
+    <ul>
+      <li>
+        <strong>GitHub Gist:</strong> synchronization data can be stored in a
+        private Gist created or selected by the user.
+      </li>
+      <li>
+        <strong>Google Drive:</strong> synchronization and package-backup files
+        can be stored in the application-managed Google Drive location authorized
+        by the user. The extension requests the <code>drive.file</code> scope.
+      </li>
+      <li>
+        <strong>WebDAV:</strong> synchronization or package-backup data can be
+        sent to the WebDAV server URL and folder configured by the user.
+      </li>
+      <li>
+        <strong>GitHub repository package backup:</strong> when selected by the
+        user, extension packages can be uploaded to the user's configured private
+        GitHub repository.
+      </li>
+    </ul>
+
+    <h2>5. Local storage and credentials</h2>
+    <p>
+      Configuration, synchronization state, provider bindings, conflict state,
+      and provider authentication state may be stored locally in the browser.
+      Access tokens, refresh tokens, GitHub tokens, and WebDAV credentials are
+      not intentionally included in synchronized browser-state payloads.
+    </p>
+
+    <h2>6. Data that is not collected for other purposes</h2>
+    <p>
+      Chromium Cloud Sync does not use the data described above for advertising,
+      behavioral profiling, credit assessment, loan decisions, unrelated
+      marketing, data brokerage, or other purposes unrelated to the extension's
+      disclosed synchronization, restoration, recovery, and backup functionality.
+      The extension does not include Google Analytics or another analytics system.
+    </p>
+
+    <h2>7. What the extension does not synchronize</h2>
+    <p>
+      The synchronization snapshot intentionally excludes browser passwords,
+      authentication credentials, third-party extension private storage/settings,
+      and unrelated extension-private data.
+    </p>
+
+    <h2>8. User control and deletion</h2>
+    <p>
+      Provider connections can be disconnected from the extension settings.
+      Disconnecting Google Drive clears the extension's local Google authorization
+      state and requests token revocation where supported. Data already stored in
+      a user-selected third-party provider remains subject to that provider's
+      controls and retention policies; users can delete their provider-side data
+      using the provider's normal account or storage controls.
+    </p>
+
+    <h2>9. Security</h2>
+    <p>
+      The extension uses HTTPS for its built-in GitHub and Google endpoints and
+      uses the authentication mechanisms required by the selected provider.
+      GitHub synchronization Gists created by the extension are private by default.
+      The current synchronization payload is not end-to-end encrypted, so users
+      should treat access to their configured synchronization backend as access to
+      the synchronized browser state.
+    </p>
+
+    <h2>10. Changes to this policy</h2>
+    <p>
+      This policy may be updated when the extension's data practices or supported
+      features change. The effective date at the top of this page identifies the
+      current version. Material changes will be reflected in the policy before
+      the corresponding extension functionality is published.
+    </p>
+
+    <h2>11. Contact</h2>
+    <p>
+      For privacy questions or requests concerning Chromium Cloud Sync, please
+      use the project's public issue tracker:
+      <a href="https://github.com/CYoJkoY/ChromiumCloudSync/issues">Chromium Cloud Sync Issues</a>.
+      Do not include passwords, access tokens, private Gist contents, or other
+      sensitive information in a public issue.
+    </p>
+
+    <footer>
+      Chromium Cloud Sync is open source under the MIT License.
+      Project repository:
+      <a href="https://github.com/CYoJkoY/ChromiumCloudSync">github.com/CYoJkoY/ChromiumCloudSync</a>
+    </footer>
+  </main>
+</body>
+</html>

@@ -6,7 +6,17 @@
  * and chat sharing.
  */
 import QRCode from 'qrcode';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Resvg } from '@resvg/resvg-js';
+
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+
+// Marcellus (SIL OFL) ships with the repo so the monogram and caption render
+// identically on every machine and on CI, instead of falling back to whatever
+// font happens to be installed.
+export const FONT_FILES = [path.join(HERE, '..', 'assets', 'fonts', 'Marcellus-Regular.ttf')];
+const DISPLAY_FONT = 'Marcellus';
 
 const PAPER = '#f7faf8';
 const INK = '#0a1020';
@@ -16,8 +26,9 @@ const FRAME_PAD = 1.6; // modules between quiet zone and frame
 const CAPTION_H = 4.6; // modules of strip below the code
 const DOT_SIZE = 0.93; // module fill ratio
 const DOT_RADIUS = 0.36;
-const BADGE_HOLE = 3.1; // modules cleared around the badge
-const BADGE_RADIUS = 2.5;
+const SEAL_RADIUS = 2.75; // modules, paper disc of the center seal
+const SEAL_RING = 0.24; // modules, accent ring outside the seal
+const BADGE_HOLE = SEAL_RADIUS + SEAL_RING + 0.55; // modules cleared around it
 
 function clampByte(value) {
     return Math.max(0, Math.min(255, Math.round(value)));
@@ -117,8 +128,6 @@ export function renderQrSvg(url, options = {}) {
     const { size, grid } = qrMatrix(url);
     const accent = options.accent || '#00ff9d';
     const darkTint = mix(darken(accent, 0.45), INK, 0.35);
-    const badgeTop = mix(accent, '#ffffff', 0.12);
-    const badgeBottom = darken(accent, 0.3);
     const letter = badgeLetter(options.displayName, options.slug);
 
     const offset = QUIET_ZONE + FRAME_PAD;
@@ -157,25 +166,37 @@ export function renderQrSvg(url, options = {}) {
       <stop offset="0" stop-color="${INK}"/>
       <stop offset="1" stop-color="${darkTint}"/>
     </linearGradient>
-    <linearGradient id="badgeGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="${badgeTop}"/>
-      <stop offset="1" stop-color="${badgeBottom}"/>
+    <linearGradient id="sealGrad" x1="0.15" y1="0" x2="0.85" y2="1">
+      <stop offset="0" stop-color="${mix(accent, '#ffffff', 0.14)}"/>
+      <stop offset="1" stop-color="${mix(accent, '#ffffff', 0.02)}"/>
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="${mix(accent, INK, 0.25)}"/>
+      <stop offset="1" stop-color="${darken(accent, 0.35)}"/>
+    </linearGradient>
+    <linearGradient id="monoGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="${INK}"/>
+      <stop offset="1" stop-color="${mix(INK, accent, 0.22)}"/>
     </linearGradient>
   </defs>
   <rect width="${width}" height="${height}" fill="${PAPER}"/>
-  <rect x="0.45" y="0.45" width="${width - 0.9}" height="${height - 0.9}" rx="4.2" fill="none" stroke="${accent}" stroke-opacity="0.55" stroke-width="0.5"/>
-  <rect x="1.15" y="1.15" width="${width - 2.3}" height="${height - 2.3}" rx="3.6" fill="none" stroke="${INK}" stroke-opacity="0.07" stroke-width="0.35"/>
+  <rect x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" rx="4.4" fill="none" stroke="${accent}" stroke-opacity="0.42" stroke-width="0.42"/>
+  <rect x="1.25" y="1.25" width="${width - 2.5}" height="${height - 2.5}" rx="3.7" fill="none" stroke="${INK}" stroke-opacity="0.06" stroke-width="0.3"/>
   <g fill="url(#inkGrad)">
     ${dots.join('\n    ')}
   </g>
   <g>
     ${finders}
   </g>
-  <circle cx="${badgeCx}" cy="${badgeCy}" r="${BADGE_RADIUS + 0.42}" fill="${PAPER}"/>
-  <circle cx="${badgeCx}" cy="${badgeCy}" r="${BADGE_RADIUS}" fill="url(#badgeGrad)" stroke="${INK}" stroke-opacity="0.12" stroke-width="0.12"/>
-  <text x="${badgeCx}" y="${badgeCy}" text-anchor="middle" dominant-baseline="central" font-family="'JetBrains Mono','DejaVu Sans Mono',Consolas,monospace" font-size="2.9" font-weight="700" fill="#08111d">${escapeXml(letter)}</text>
-  <text x="${width / 2}" y="${width + CAPTION_H * 0.52}" text-anchor="middle" font-family="'DejaVu Sans','Segoe UI',Arial,sans-serif" font-size="1.65" font-weight="600" letter-spacing="0.32" fill="${INK}" fill-opacity="0.82">${caption}</text>
-  <rect x="${width / 2 - 0.9}" y="${width + CAPTION_H * 0.68}" width="1.8" height="0.34" rx="0.17" fill="${accent}"/>
+  <g>
+    <circle cx="${badgeCx}" cy="${badgeCy}" r="${SEAL_RADIUS + SEAL_RING * 0.9}" fill="none" stroke="url(#ringGrad)" stroke-width="${SEAL_RING}"/>
+    <circle cx="${badgeCx}" cy="${badgeCy}" r="${SEAL_RADIUS}" fill="${PAPER}" stroke="${INK}" stroke-opacity="0.16" stroke-width="0.1"/>
+    <circle cx="${badgeCx}" cy="${badgeCy}" r="${SEAL_RADIUS - 0.36}" fill="none" stroke="${INK}" stroke-opacity="0.22" stroke-width="0.08"/>
+    <text x="${badgeCx}" y="${badgeCy - 0.34}" text-anchor="middle" dominant-baseline="central" font-family="${DISPLAY_FONT}" font-size="4.05" letter-spacing="0.04" fill="url(#monoGrad)">${escapeXml(letter)}</text>
+    <path d="M${badgeCx} ${badgeCy + 1.0} l0.3 0.36 -0.3 0.36 -0.3 -0.36z" fill="${accent}"/>
+  </g>
+  <text x="${width / 2}" y="${width + CAPTION_H * 0.5}" text-anchor="middle" font-family="${DISPLAY_FONT}" font-size="1.95" letter-spacing="0.46" fill="${INK}" fill-opacity="0.86">${caption}</text>
+  <rect x="${width / 2 - 1.15}" y="${width + CAPTION_H * 0.7}" width="2.3" height="0.26" rx="0.13" fill="url(#ringGrad)"/>
 </svg>
 `;
 }
@@ -189,7 +210,11 @@ export function svgToPng(svg, width = 1024) {
     const resvg = new Resvg(svg, {
         fitTo: { mode: 'width', value: width },
         background: PAPER,
-        font: { loadSystemFonts: true, defaultFontFamily: 'DejaVu Sans' }
+        font: {
+            fontFiles: FONT_FILES,
+            loadSystemFonts: true,
+            defaultFontFamily: DISPLAY_FONT
+        }
     });
     return resvg.render().asPng();
 }

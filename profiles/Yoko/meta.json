@@ -1,0 +1,22 @@
+{
+    "displayName": "Yoko",
+    "headline": "Support Me",
+    "accent": "#00ff9d",
+    "intro": [
+        "如果我为您带来了便利或乐趣，欢迎自愿打赏。",
+        "If I made your life easier or just brought you some fun, tips are always appreciated."
+    ],
+    "wechat": {
+        "note": ["微信支付", "支持微信余额"]
+    },
+    "alipay": {
+        "note": ["支付宝", "支持支付宝余额"]
+    },
+    "kofi": {
+        "note": ["International", "Support via Credit Card or PayPal"]
+    },
+    "footer": [
+        ["感谢您支持独立开发。", "Thank you for supporting independent development."],
+        ["对所有自愿捐赠均深表感谢。", "All voluntary donations are appreciated."]
+    ]
+}

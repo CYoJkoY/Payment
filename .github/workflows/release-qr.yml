@@ -1,0 +1,70 @@
+# Build a user's page and publish their QR code into the GitHub Release for
+# their tag.
+#
+# How it works:
+#   - A push of a tag (e.g. "Yoko") finds the matching folder profiles/Yoko/,
+#     injects that folder's WeChat/Alipay images and Ko-fi link into the page,
+#     generates the QR code that opens the page, and uploads the QR (PNG + SVG)
+#     to the Release for that tag.
+#   - The site itself is (re)deployed to Pages so the QR target is live.
+name: Publish user QR to Release
+
+on:
+  push:
+    tags: ["*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag / profile folder to publish (e.g. Yoko)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and verify user pages and QR codes
+        run: npm run check
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
+
+      - name: Publish QR to Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          TAG_NAME: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+        run: node scripts/release.mjs --tag "$TAG_NAME"

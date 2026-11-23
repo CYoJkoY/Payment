@@ -1,64 +1,91 @@
 # Payment
 
-Payment is a static, multi-user support page. Each configured username gets a
-page such as `https://cyojkoy.github.io/Payment/Yoko/`, along with a branded QR
-code in SVG and PNG that opens that page.
+一个静态的多用户赞助页面。每个用户对应一个文件夹，也对应一个 **git tag**。
+发布某个 tag 时，项目会根据 tag 名称找到同名文件夹，把里面的微信、支付宝图片和
+Ko-fi 链接放进网页对应的位置，生成一个指向该用户页面（如
+`https://cyojkoy.github.io/Payment/Yoko/`）的二维码（SVG + PNG），并把二维码
+作为资产上传到该 tag 的 **GitHub Release**。
 
-## Add a user
+## 目录结构
 
-1. Put the user's payment QR images in `assets/` (PNG, WebP, or another browser-supported image format).
-2. Add a user entry to `data/users.json`. Copy the existing Yoko entry and change its values:
+```
+site.json                 # 站点级配置（baseUrl、默认主题色、首页展示的用户）
+profiles/
+  Yoko/                   # 文件夹名 = 用户 slug = git tag
+    wechat.webp           # 微信收款二维码图片（png/webp/jpg/jpeg/gif）
+    alipay.webp           # 支付宝收款二维码图片
+    kofi.txt              # 只写一行 Ko-fi 链接
+    meta.json             # 可选：显示名、标题、主题色、介绍、备注、页脚
+template/page.html        # 页面模板（三个卡片使用微信/支付宝/Ko-fi 官方图标）
+scripts/                  # 构建、二维码、校验、发布脚本
+```
+
+## 新增一个用户
+
+1. 建一个文件夹 `profiles/<tag>/`，名字就是以后发布的 tag，例如 `profiles/Alex/`。
+2. 放入 `wechat.<png|webp|jpg>` 和 `alipay.<png|webp|jpg>` 两张收款二维码图片。
+3. 新建 `kofi.txt`，写入一行 Ko-fi 链接，例如 `https://ko-fi.com/alex`。
+4. （可选）写 `meta.json` 定制文案与主题色：
 
 ```json
 {
-    "slug": "Alex",
     "displayName": "Alex",
     "headline": "Support Alex",
     "accent": "#1677ff",
     "intro": ["欢迎支持 Alex。", "Thank you for supporting Alex."],
-    "wechat": {
-        "qr": "assets/Alex-WeChat.png",
-        "note": ["微信支付", "支持微信余额"]
-    },
-    "alipay": {
-        "qr": "assets/Alex-Alipay.png",
-        "note": ["支付宝", "支持支付宝余额"]
-    },
-    "kofi": {
-        "url": "https://ko-fi.com/alex",
-        "note": ["International", "Support via Credit Card or PayPal"]
-    },
-    "footer": [
-        ["感谢您的支持。", "Thank you for your support."]
-    ]
+    "footer": [["感谢您的支持。", "Thank you for your support."]]
 }
 ```
 
-`slug` becomes the URL path, so `Alex` creates `/Payment/Alex/`. Slugs can use
-letters, digits, dots, dashes, and underscores, and must be unique ignoring
-case. Add a real Ko-fi URL and both QR image paths; the build checks these
-values and rejects a missing image. Use a 3- or 6-digit hex value for `accent`.
+`accent` 用 3 位或 6 位十六进制颜色。页面路由为该文件夹名，`profiles/Alex/`
+对应 `/Payment/Alex/`。
 
-`site.baseUrl` in `data/users.json` is the Pages site root and must end with a
-slash. `site.primary` selects which user's page appears at `/Payment/`; the
-named `/Payment/<slug>/` page is generated for every user regardless.
+## 发布 / 生成二维码到 Release
 
-## Build and preview
+提交并推送后，创建一个与文件夹同名的 tag 并推送：
+
+```sh
+git tag Alex
+git push origin main
+git push origin Alex
+```
+
+推送 tag 会触发 `.github/workflows/release-qr.yml`：
+
+- 找到 `profiles/Alex/`，把图片/链接注入网页三个卡片；
+- 构建整站并部署到 GitHub Pages（保证二维码指向的页面可访问）；
+- 生成二维码，并上传到 `Alex` 这个 tag 的 GitHub Release（`Alex.png`、`Alex.svg`）。
+
+也可以在 Actions 页面手动运行该 workflow 并填入 tag 名。
+
+## 本地构建与预览
 
 ```sh
 npm ci
-npm run check
-npm run preview
+npm run check          # 构建 + 解码校验所有二维码
+npm run preview         # 打开 http://localhost:4173/Yoko/
+node scripts/release.mjs --tag Yoko --dry-run   # 预览发布内容，不联网
 ```
 
-Open `http://localhost:4173/Yoko/` to preview a generated page. The build writes
-static pages and QR files to `dist/`:
+构建产物（页面、二维码）输出到 `dist/`：
 
-- `dist/<slug>/index.html` — the user's support page
-- `dist/qr/<slug>.svg` — scalable share QR artwork
-- `dist/qr/<slug>.png` — 1024-pixel share QR image
-- `dist/index.html` — the selected primary user's page
+- `dist/<slug>/index.html` —— 用户页面
+- `dist/qr/<slug>.svg` / `dist/qr/<slug>.png` —— 分享/发布用二维码
+- `dist/index.html` —— `site.json` 中 `primary` 指定用户的页面（站点首页）
 
-`npm run check` rebuilds the site and decodes each QR export to verify it
-contains the exact configured page URL. GitHub Actions runs the same check and
-publishes `dist/` to GitHub Pages after changes reach `main`.
+`npm run check` 会重新构建并解码每个二维码，确认它确实指向配置的页面地址；
+GitHub Actions 每次推送都会跑同样的检查。
+
+## 站点配置 `site.json`
+
+```json
+{
+    "baseUrl": "https://cyojkoy.github.io/Payment/",
+    "lang": "zh-CN",
+    "titleSuffix": "赞助支持",
+    "defaultAccent": "#00ff9d",
+    "primary": "Yoko"
+}
+```
+
+`baseUrl` 必须以 `/` 结尾；`primary` 决定站点根路径展示哪个用户的页面。

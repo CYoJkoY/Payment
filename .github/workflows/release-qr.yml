@@ -6,7 +6,8 @@
 #     injects that folder's WeChat/Alipay images and Ko-fi link into the page,
 #     generates the QR code that opens the page, and uploads the QR (PNG + SVG)
 #     to the Release for that tag.
-#   - The site itself is (re)deployed to Pages so the QR target is live.
+#   - The site itself is deployed to Pages by static.yml on pushes to main,
+#     so this job only builds/verifies and publishes the Release assets.
 name: Publish user QR to Release
 
 on:
@@ -21,18 +22,13 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 concurrency:
-  group: "pages"
+  group: "release-qr-${{ github.ref }}"
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -49,18 +45,6 @@ jobs:
 
       - name: Build and verify user pages and QR codes
         run: npm run check
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'dist'
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
 
       - name: Publish QR to Release
         env:

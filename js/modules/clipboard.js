@@ -36,9 +36,4 @@ export function initClipboard() {
         success: 'Copied to clipboard!',
         failure: 'Copy failed'
     });
-
-    bindCopy('copy-page-btn', 'copy-page-feedback', () => CONFIG.pageUrl, {
-        success: '已复制页面链接',
-        failure: '复制失败'
-    });
 }

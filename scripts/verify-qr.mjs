@@ -8,7 +8,7 @@ import path from 'node:path';
 import jsQR from 'jsqr';
 import { PNG } from 'pngjs';
 import { svgToPngCrisp, qrMatrix } from './qr.mjs';
-import { ROOT, loadProfiles, pageUrlFor } from './profiles.mjs';
+import { ROOT, loadProfiles, pageUrlFor, escapeHtml } from './profiles.mjs';
 
 const DIST = path.join(ROOT, 'dist');
 
@@ -26,6 +26,16 @@ function main() {
         throw new Error('[verify] dist/ is missing, run "npm run build" first');
     }
 
+    // Card images must come from the profile folder, and the page must never
+    // embed the QR code that opens the page itself — that QR ships in the
+    // tag's Release only.
+    const pageMatchesContract = (html, profile, assetBase) => html.includes(`<link rel="canonical" href="${pageUrlFor(site, profile.slug)}">`)
+        && html.includes(`src="${assetBase}assets/${profile.slug}/wechat${profile.wechatExt}"`)
+        && html.includes(`src="${assetBase}assets/${profile.slug}/alipay${profile.alipayExt}"`)
+        && html.includes(`href="${escapeHtml(profile.kofiUrl)}"`)
+        && !new RegExp(`<img[^>]*qr/${profile.slug}\\.(svg|png)`).test(html)
+        && !/\{\{[A-Z_]+\}\}/.test(html);
+
     let failures = 0;
     for (const profile of profiles) {
         const expected = pageUrlFor(site, profile.slug);
@@ -39,10 +49,7 @@ function main() {
             continue;
         }
 
-        const page = fs.readFileSync(pageFile, 'utf8');
-        const pageOk = page.includes(`<link rel="canonical" href="${expected}">`)
-            && page.includes(`src="../qr/${profile.slug}.svg"`)
-            && !/\{\{[A-Z_]+\}\}/.test(page);
+        const pageOk = pageMatchesContract(fs.readFileSync(pageFile, 'utf8'), profile, '../');
         const fromPng = decode(fs.readFileSync(pngFile));
         const svg = fs.readFileSync(svgFile, 'utf8');
         const { size } = qrMatrix(expected);
@@ -52,6 +59,19 @@ function main() {
         const svgOk = fromSvg === expected;
         console.log(`${pngOk && svgOk && pageOk ? 'ok  ' : 'FAIL'} ${profile.slug.padEnd(12)} page=${pageOk ? 'match' : 'invalid'} png=${pngOk ? 'match' : fromPng || 'unreadable'} svg=${svgOk ? 'match' : fromSvg || 'unreadable'}`);
         if (!pngOk || !svgOk || !pageOk) failures += 1;
+    }
+
+    const rootPage = path.join(DIST, 'index.html');
+    if (fs.existsSync(rootPage)) {
+        const primary = profiles.find((p) => p.slug === site.primary) || profiles[0];
+        if (!primary) {
+            console.log('FAIL root: no primary profile to render');
+            failures += 1;
+        } else {
+            const ok = pageMatchesContract(fs.readFileSync(rootPage, 'utf8'), primary, '');
+            console.log(`${ok ? 'ok  ' : 'FAIL'} ${'index.html'.padEnd(12)} page=${ok ? 'match' : 'invalid'}`);
+            if (!ok) failures += 1;
+        }
     }
 
     if (failures > 0) {

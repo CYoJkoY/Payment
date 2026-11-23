@@ -70,27 +70,6 @@
         </article>
     </main>
 
-    <section class="share reveal" style="--delay: 0.4s">
-        <div class="share-qr qr-container" data-modal-target="qr-share">
-            <img id="qr-share" src="{{SHARE_SVG}}" alt="Share QR code for {{PAGE_URL}}">
-        </div>
-        <div class="share-body">
-            <h2>扫码进入 <span class="share-name">{{DISPLAY_NAME}}</span> 的主页</h2>
-            <p>Scan the code to open this page, or send the link to anyone.</p>
-            <p class="share-url" id="share-url">{{PAGE_URL}}</p>
-            <div class="share-actions">
-                <button id="copy-page-btn" class="btn btn-copy">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                    复制页面链接
-                </button>
-                <a class="btn btn-download" href="{{SHARE_PNG}}" download="{{SLUG}}-qr.png">
-                    下载 PNG
-                </a>
-            </div>
-            <div id="copy-page-feedback" class="copy-feedback">已复制页面链接</div>
-        </div>
-    </section>
-
     <footer class="footer reveal">
         {{FOOTER}}
     </footer>

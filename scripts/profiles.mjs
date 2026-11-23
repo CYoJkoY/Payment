@@ -43,6 +43,16 @@ function findImage(dir, base) {
     return null;
 }
 
+/** Escape a value for safe use in HTML text and attribute contexts. */
+export function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 /** Read site.json (baseUrl, lang, defaultAccent, primary) with validation. */
 export function readSite() {
     if (!fs.existsSync(SITE_FILE)) fail('site.json is missing');

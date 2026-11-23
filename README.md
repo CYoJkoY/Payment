@@ -53,10 +53,11 @@ git push origin Alex
 推送 tag 会触发 `.github/workflows/release-qr.yml`：
 
 - 找到 `profiles/Alex/`，把图片/链接注入网页三个卡片；
-- 构建整站并部署到 GitHub Pages（保证二维码指向的页面可访问）；
+- 构建并解码校验二维码；
 - 生成二维码，并上传到 `Alex` 这个 tag 的 GitHub Release（`Alex.png`、`Alex.svg`）。
 
-也可以在 Actions 页面手动运行该 workflow 并填入 tag 名。
+页面本身部署在 GitHub Pages（由推送 `main` 的 `static.yml` 负责），所以要先合并到
+`main` 再打 tag。也可以在 Actions 页面手动运行该 workflow 并填入 tag 名。
 
 ## 本地构建与预览
 
@@ -70,7 +71,7 @@ node scripts/release.mjs --tag Yoko --dry-run   # 预览发布内容，不联网
 构建产物（页面、二维码）输出到 `dist/`：
 
 - `dist/<slug>/index.html` —— 用户页面
-- `dist/qr/<slug>.svg` / `dist/qr/<slug>.png` —— 分享/发布用二维码
+- `dist/qr/<slug>.svg` / `dist/qr/<slug>.png` —— 发布到 Release 的二维码（页面本身不内嵌）
 - `dist/index.html` —— `site.json` 中 `primary` 指定用户的页面（站点首页）
 
 `npm run check` 会重新构建并解码每个二维码，确认它确实指向配置的页面地址；

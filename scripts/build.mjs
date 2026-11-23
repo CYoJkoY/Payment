@@ -3,30 +3,22 @@
  *
  * Reads every folder under profiles/ (each folder is one user, named by their
  * tag/slug), renders one static page under /<slug>/, injects that user's
- * WeChat/Alipay/Ko-fi assets into the three card slots, and generates a
- * stylized share QR code (SVG + PNG) for the page URL.
+ * WeChat/Alipay/Ko-fi assets into the three card slots, and generates the QR
+ * code (SVG + PNG) for the page URL, which ships in the tag's Release rather
+ * than on the page itself.
  *
  * Output goes to dist/, which is what GitHub Pages deploys.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { renderQrSvg, svgToPngCrisp, qrMatrix } from './qr.mjs';
-import { ROOT, loadProfiles, pageUrlFor } from './profiles.mjs';
+import { ROOT, loadProfiles, pageUrlFor, escapeHtml } from './profiles.mjs';
 
 const DIST = path.join(ROOT, 'dist');
 const TEMPLATE = path.join(ROOT, 'template', 'page.html');
 
 function fail(message) {
     throw new Error(`[build] ${message}`);
-}
-
-function escapeHtml(value) {
-    return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
 }
 
 function paragraphs(lines) {
@@ -49,7 +41,7 @@ function footerBlock(paragraphsList) {
         .join('\n');
 }
 
-function renderPage({ site, profile, assetBase, shareSvg, sharePng }) {
+function renderPage({ site, profile, assetBase }) {
     const pageUrl = pageUrlFor(site, profile.slug);
     const title = `${profile.headline || 'Support Me'} | ${site.titleSuffix || '赞助支持'}`;
     const description = (profile.intro && profile.intro[0]) || `${profile.displayName} 的赞助支持页面`;
@@ -71,11 +63,6 @@ function renderPage({ site, profile, assetBase, shareSvg, sharePng }) {
         KOFI_URL: escapeHtml(profile.kofiUrl),
         KOFI_NOTE: linesBlock(profile.kofiNote),
         FOOTER: footerBlock(profile.footer),
-        SHARE_SVG: escapeHtml(assetBase + shareSvg),
-        SHARE_PNG: escapeHtml(assetBase + sharePng),
-        PAGE_URL: escapeHtml(pageUrl),
-        SLUG: escapeHtml(profile.slug),
-        DISPLAY_NAME: escapeHtml(profile.displayName),
         PAGE_CONFIG: JSON.stringify({
             slug: profile.slug,
             displayName: profile.displayName,
@@ -177,9 +164,7 @@ function main() {
         const html = renderPage({
             site,
             profile,
-            assetBase: '../',
-            shareSvg: `qr/${profile.slug}.svg`,
-            sharePng: `qr/${profile.slug}.png`
+            assetBase: '../'
         });
         fs.writeFileSync(path.join(DIST, profile.slug, 'index.html'), html);
         console.log(`  ${profile.slug}/index.html`);
@@ -189,9 +174,7 @@ function main() {
     const rootHtml = renderPage({
         site,
         profile: primaryProfile,
-        assetBase: '',
-        shareSvg: `qr/${primaryProfile.slug}.svg`,
-        sharePng: `qr/${primaryProfile.slug}.png`
+        assetBase: ''
     });
     fs.writeFileSync(path.join(DIST, 'index.html'), rootHtml);
     console.log(`  index.html  (primary user: ${primary})`);

@@ -68,11 +68,14 @@ npm run preview         # 打开 http://localhost:4173/Yoko/
 node scripts/release.mjs --tag Yoko --dry-run   # 预览发布内容，不联网
 ```
 
-构建产物（页面、二维码）输出到 `dist/`：
+构建产物分成两部分：
 
-- `dist/<slug>/index.html` —— 用户页面
-- `dist/qr/<slug>.svg` / `dist/qr/<slug>.png` —— 发布到 Release 的二维码（页面本身不内嵌）
+- `dist/<slug>/index.html` —— 用户页面（部署到 Pages）
 - `dist/index.html` —— `site.json` 中 `primary` 指定用户的页面（站点首页）
+- `build/qr/<slug>.svg` / `build/qr/<slug>.png` —— 只用于上传 Release 的二维码
+
+`build/` 不会被 Pages 部署：站点上既没有 `/qr/<slug>.png` 这个地址，页面也不含
+`og:image` 或任何指向二维码的链接，二维码只存在于该 tag 的 Release 里。
 
 `npm run check` 会重新构建并解码每个二维码，确认它确实指向配置的页面地址；
 GitHub Actions 每次推送都会跑同样的检查。

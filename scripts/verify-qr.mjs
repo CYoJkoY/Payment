@@ -2,6 +2,10 @@
  * Decodes every generated QR code and checks it points at the right page URL.
  * Both the PNG export and the SVG artwork are checked, so a styling change that
  * breaks scanning fails the build instead of shipping.
+ *
+ * It also enforces that the generated QR never leaks into the site: the QR
+ * lives in build/qr/ (Release asset only), so no page may reference /qr/ or
+ * advertise it through og:image.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -11,6 +15,7 @@ import { svgToPngCrisp, qrMatrix } from './qr.mjs';
 import { ROOT, loadProfiles, pageUrlFor, escapeHtml } from './profiles.mjs';
 
 const DIST = path.join(ROOT, 'dist');
+const QR_DIR = path.join(ROOT, 'build', 'qr');
 
 function decode(buffer) {
     const image = PNG.sync.read(buffer);
@@ -27,24 +32,25 @@ function main() {
     }
 
     // Card images must come from the profile folder, and the page must never
-    // embed the QR code that opens the page itself — that QR ships in the
-    // tag's Release only.
+    // reference the QR code that opens the page itself — that QR ships in the
+    // tag's Release only. Any "qr/" URL (img, og:image, CSS, link) fails.
     const pageMatchesContract = (html, profile, assetBase) => html.includes(`<link rel="canonical" href="${pageUrlFor(site, profile.slug)}">`)
         && html.includes(`src="${assetBase}assets/${profile.slug}/wechat${profile.wechatExt}"`)
         && html.includes(`src="${assetBase}assets/${profile.slug}/alipay${profile.alipayExt}"`)
         && html.includes(`href="${escapeHtml(profile.kofiUrl)}"`)
-        && !new RegExp(`<img[^>]*qr/${profile.slug}\\.(svg|png)`).test(html)
+        && !/qr\//.test(html)
+        && !/og:image/.test(html)
         && !/\{\{[A-Z_]+\}\}/.test(html);
 
     let failures = 0;
     for (const profile of profiles) {
         const expected = pageUrlFor(site, profile.slug);
-        const pngFile = path.join(DIST, 'qr', `${profile.slug}.png`);
-        const svgFile = path.join(DIST, 'qr', `${profile.slug}.svg`);
+        const pngFile = path.join(QR_DIR, `${profile.slug}.png`);
+        const svgFile = path.join(QR_DIR, `${profile.slug}.svg`);
         const pageFile = path.join(DIST, profile.slug, 'index.html');
 
         if (!fs.existsSync(pngFile) || !fs.existsSync(svgFile) || !fs.existsSync(pageFile)) {
-            console.log(`FAIL ${profile.slug}: page or qr/{svg,png} missing`);
+            console.log(`FAIL ${profile.slug}: page or build/qr/{svg,png} missing`);
             failures += 1;
             continue;
         }

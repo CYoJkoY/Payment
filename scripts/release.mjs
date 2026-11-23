@@ -4,7 +4,9 @@
  * Flow:
  *   1. The tag name identifies a profile folder (profiles/<tag>/) - see
  *      profiles.mjs#resolveProfileByTag.
- *   2. The profile's page + QR must already be built into dist/ (npm run build).
+ *   2. The profile's page + QR must already be built (npm run build), which
+ *      writes the QR artwork to build/qr/ — build/ is never deployed to Pages,
+ *      so the Release is the only place this image exists.
  *   3. This script creates (or updates) the Release for that tag and uploads
  *      the QR assets (PNG + SVG) so anyone can scan or download them.
  *
@@ -125,8 +127,8 @@ async function main() {
     const url = pageUrlFor(site, profile.slug);
     console.log(`[release] tag "${tag}" -> profile "${profile.slug}" -> ${url}`);
 
-    const pngFile = path.join(ROOT, 'dist', 'qr', `${profile.slug}.png`);
-    const svgFile = path.join(ROOT, 'dist', 'qr', `${profile.slug}.svg`);
+    const pngFile = path.join(ROOT, 'build', 'qr', `${profile.slug}.png`);
+    const svgFile = path.join(ROOT, 'build', 'qr', `${profile.slug}.svg`);
     for (const file of [pngFile, svgFile]) {
         if (!fs.existsSync(file)) fail(`missing ${path.relative(ROOT, file)}; run "npm run build" first`);
     }

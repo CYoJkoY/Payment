@@ -1,9 +1,9 @@
 /**
  * Profile loader.
  *
- * Every folder under profiles/ is one user. The folder name is the user's slug,
- * which is also the git tag that publishes them. A folder holds the payment
- * assets that get placed into the site's three card slots:
+ * Every folder under profiles/ is one user. The folder name is the user's slug.
+ * A folder holds the payment assets that get placed into the site's three card
+ * slots:
  *
  *   profiles/<slug>/
  *     meta.json        optional: displayName, headline, accent, intro, footer, notes
@@ -136,20 +136,4 @@ export function loadProfiles() {
     }
 
     return { site, profiles, primary };
-}
-
-/**
- * Resolve a git tag to a profile folder. The tag name should match a folder
- * exactly; a leading "v" is also tolerated (tag vYoko -> folder Yoko).
- */
-export function resolveProfileByTag(tag) {
-    const clean = String(tag || '').replace(/^refs\/tags\//, '').trim();
-    if (!clean) fail('empty tag name');
-    const { site, profiles } = loadProfiles();
-    const direct = profiles.find((profile) => profile.slug === clean);
-    if (direct) return { site, profile: direct, tag: clean };
-    const stripped = clean.replace(/^v/i, '');
-    const fallback = profiles.find((profile) => profile.slug === stripped);
-    if (fallback) return { site, profile: fallback, tag: clean };
-    fail(`no profile folder matches tag "${clean}" (expected profiles/${clean}/)`);
 }

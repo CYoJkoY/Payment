@@ -9,6 +9,10 @@
  *      so the Release is the only place this image exists.
  *   3. This script creates (or updates) the Release for that tag and uploads
  *      the QR assets (PNG + SVG) so anyone can scan or download them.
+ *   4. Every run re-points the Release at the commit the tag currently points
+ *      to. GitHub keeps target_commitish from creation time, so a moved or
+ *      re-pushed tag would otherwise leave the Release comparing "0 commits"
+ *      against a stale SHA.
  *
  * Usage:
  *   node scripts/release.mjs --tag Yoko
@@ -25,6 +29,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { ROOT, resolveProfileByTag, pageUrlFor } from './profiles.mjs';
 
 const API = 'https://api.github.com';
@@ -48,6 +53,39 @@ function parseArgs(argv) {
 
 function fail(message) {
     throw new Error(`[release] ${message}`);
+}
+
+/** Pixel size straight out of the PNG IHDR chunk, for an accurate asset label. */
+function pngSize(buffer) {
+    if (buffer.length < 24 || buffer.readUInt32BE(12) !== 0x49484452) return null;
+    return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
+}
+
+/** Commit that a tag really points to: local git, then the API, then CI's SHA. */
+async function resolveTagCommit(token, repo, tag) {
+    try {
+        const sha = execFileSync('git', ['rev-parse', `refs/tags/${tag}^{commit}`], {
+            cwd: ROOT,
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'ignore']
+        }).trim();
+        if (/^[0-9a-f]{40}$/.test(sha)) return sha;
+    } catch {
+        // Tags are not always fetched in CI; fall back to the API below.
+    }
+    if (token && repo) {
+        try {
+            const ref = await gh('GET', `${API}/repos/${repo}/git/ref/tags/${encodeURIComponent(tag)}`, { token });
+            if (ref?.object?.type === 'tag') {
+                const annotated = await gh('GET', `${API}/repos/${repo}/git/tags/${ref.object.sha}`, { token });
+                if (annotated?.object?.sha) return annotated.object.sha;
+            }
+            if (ref?.object?.sha) return ref.object.sha;
+        } catch {
+            // Tag may not be visible yet; GITHUB_SHA is still correct for tag pushes.
+        }
+    }
+    return process.env.GITHUB_SHA || null;
 }
 
 async function gh(method, url, { token, body, headers = {}, raw = false } = {}) {
@@ -81,22 +119,32 @@ async function getRelease(token, repo, tag) {
     }
 }
 
-async function ensureRelease(token, repo, tag, name, body) {
+async function ensureRelease(token, repo, tag, name, body, commitish) {
     let release = await getRelease(token, repo, tag);
+    const target = commitish || undefined;
     if (release) {
         console.log(`[release] updating existing release for tag "${tag}" (id ${release.id})`);
+        if (target && release.target_commitish !== target) {
+            console.log(`[release] re-pointing release ${release.target_commitish || '(none)'} -> ${target}`);
+        }
         release = await gh('PATCH', `${API}/repos/${repo}/releases/${release.id}`, {
             token,
-            body: JSON.stringify({ name, body }),
+            body: JSON.stringify({ name, body, ...(target ? { target_commitish: target } : {}) }),
             headers: { 'Content-Type': 'application/json' }
         });
         return release;
     }
     console.log(`[release] creating release for tag "${tag}"`);
-    const target = process.env.GITHUB_SHA || undefined;
     return gh('POST', `${API}/repos/${repo}/releases`, {
         token,
-        body: JSON.stringify({ tag_name: tag, name, body, target_commitish: target, draft: false, prerelease: false }),
+        body: JSON.stringify({
+            tag_name: tag,
+            name,
+            body,
+            ...(target ? { target_commitish: target } : {}),
+            draft: false,
+            prerelease: false
+        }),
         headers: { 'Content-Type': 'application/json' }
     });
 }
@@ -133,6 +181,12 @@ async function main() {
         if (!fs.existsSync(file)) fail(`missing ${path.relative(ROOT, file)}; run "npm run build" first`);
     }
 
+    const token = process.env.GITHUB_TOKEN;
+    const repo = args.repo || process.env.GITHUB_REPOSITORY;
+    const commitish = args.dryRun ? null : await resolveTagCommit(token, repo, tag);
+
+    const pngDim = pngSize(fs.readFileSync(pngFile));
+    const pngLabel = pngDim ? `${pngDim.width}×${pngDim.height} PNG` : 'PNG';
     const displayName = profile.displayName || profile.slug;
     const body = [
         `赞助页面 / Support page: ${url}`,
@@ -140,7 +194,7 @@ async function main() {
         '扫码或下载二维码即可进入该页面：',
         'Scan the QR or download the image to open this page:',
         '',
-        `- \`${profile.slug}.png\` — 1024px PNG`,
+        `- \`${profile.slug}.png\` — ${pngLabel}`,
         `- \`${profile.slug}.svg\` — 矢量 SVG`
     ].join('\n');
     const name = `${displayName} · QR`;
@@ -150,17 +204,17 @@ async function main() {
         console.log(`  tag:  ${tag}`);
         console.log(`  name: ${name}`);
         console.log(`  repo: ${args.repo || '(from GITHUB_REPOSITORY)'}`);
+        console.log(`  commit: ${commitish || '(resolved at run time)'}`);
         console.log(`  file: ${path.relative(ROOT, pngFile)}`);
         console.log(`  file: ${path.relative(ROOT, svgFile)}`);
         return;
     }
 
-    const token = process.env.GITHUB_TOKEN;
-    const repo = args.repo || process.env.GITHUB_REPOSITORY;
     if (!token) fail('GITHUB_TOKEN is not set');
     if (!repo || !/^[^/]+\/[^/]+$/.test(repo)) fail('repo must be "owner/repo" (set --repo or GITHUB_REPOSITORY)');
+    console.log(`[release] tag commit: ${commitish || '(unresolved)'}`);
 
-    const release = await ensureRelease(token, repo, tag, name, body);
+    const release = await ensureRelease(token, repo, tag, name, body, commitish);
     await uploadAsset(token, repo, release, pngFile, `${profile.slug}.png`);
     await uploadAsset(token, repo, release, svgFile, `${profile.slug}.svg`);
     console.log(`[release] done: ${release.html_url}`);

@@ -266,6 +266,12 @@ export function svgToPng(svg, width = 1024) {
  * crisp. Aliased edges are what break strict decoders most often.
  */
 export function svgToPngCrisp(svg, totalModules, targetWidth = 1024) {
-    const pixelsPerModule = Math.max(8, Math.round(targetWidth / totalModules));
+    let pixelsPerModule = Math.max(8, Math.round(targetWidth / totalModules));
+    // ZXing's default hybrid binarizer binarizes in 8x8 pixel blocks. If a module
+    // is an exact multiple of 8 px, every block lands wholly inside one module
+    // (all-black or all-white), the local threshold degenerates, and the code
+    // fails to decode at its native size even though it is perfectly sharp.
+    // Nudging off the multiple keeps ZXing (and thus most phone scanners) happy.
+    if (pixelsPerModule % 8 === 0) pixelsPerModule += 1;
     return svgToPng(svg, Math.round(totalModules * pixelsPerModule));
 }

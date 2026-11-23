@@ -5,13 +5,19 @@
  * slug), renders one static page under /<slug>/, and injects that user's
  * WeChat/Alipay/Ko-fi assets into the three card slots.
  *
+ * It also draws the ink-wash QR card that opens that page and writes it to
+ * build/qr/ — never dist/ — so the artwork lives only as a Release asset and
+ * no page ever references it.
+ *
  * Output goes to dist/, which is what GitHub Pages deploys.
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { renderQrSvg, svgToPngCrisp, qrMatrix, moduleSpan } from './qr.mjs';
 import { ROOT, loadProfiles, pageUrlFor, escapeHtml } from './profiles.mjs';
 
 const DIST = path.join(ROOT, 'dist');
+const QR_DIR = path.join(ROOT, 'build', 'qr');
 const TEMPLATE = path.join(ROOT, 'template', 'page.html');
 
 function fail(message) {
@@ -76,6 +82,22 @@ function renderPage({ site, profile, assetBase }) {
     return html;
 }
 
+function writeQrCodes(site, profiles) {
+    for (const profile of profiles) {
+        const url = pageUrlFor(site, profile.slug);
+        const svg = renderQrSvg(url, {
+            displayName: profile.displayName,
+            slug: profile.slug
+        });
+        const { size } = qrMatrix(url);
+        const png = svgToPngCrisp(svg, moduleSpan(size), 1200);
+
+        fs.writeFileSync(path.join(QR_DIR, `${profile.slug}.svg`), svg);
+        fs.writeFileSync(path.join(QR_DIR, `${profile.slug}.png`), png);
+        console.log(`  build/qr/${profile.slug}.svg  build/qr/${profile.slug}.png  ->  ${url}`);
+    }
+}
+
 function copyTree(from, to, filter) {
     fs.cpSync(path.join(ROOT, from), path.join(DIST, to), { recursive: true, filter });
 }
@@ -128,14 +150,18 @@ function main() {
 
     if (path.basename(DIST) !== 'dist' || !DIST.startsWith(ROOT)) fail(`refusing to clean ${DIST}`);
     fs.rmSync(DIST, { recursive: true, force: true });
+    fs.rmSync(QR_DIR, { recursive: true, force: true });
     fs.mkdirSync(DIST, { recursive: true });
+    fs.mkdirSync(QR_DIR, { recursive: true });
 
     for (const dir of ['css', 'js']) copyTree(dir, dir);
-    copyTree('assets', 'assets');
+    // assets/fonts is only needed to rasterize the Release QR, never by the site.
+    copyTree('assets', 'assets', (src) => path.basename(src) !== 'fonts');
     fs.writeFileSync(path.join(DIST, '.nojekyll'), '');
 
     console.log(`[build] ${profiles.length} user(s) from profiles/`);
     copyProfileImages(profiles);
+    writeQrCodes(site, profiles);
 
     for (const profile of profiles) {
         fs.mkdirSync(path.join(DIST, profile.slug), { recursive: true });

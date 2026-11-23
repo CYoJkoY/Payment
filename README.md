@@ -6,6 +6,8 @@ Alipay、Ko-fi 的官方品牌图标。页面由 GitHub Pages 托管，例如
 `https://cyojkoy.github.io/Payment/Yoko/`。
 
 页面只展示收款用的微信/支付宝二维码图片，不含任何指向网页本身的二维码。
+「进入网页」的分享二维码不会出现在页面里，而是随 tag 自动发布到该 tag 的
+GitHub Release（见下文「二维码分享卡片」）。
 
 ## 目录结构
 
@@ -46,6 +48,7 @@ scripts/                  # 构建与本地预览脚本
 ```sh
 npm ci
 npm run build           # 生成 dist/
+npm run check           # 构建并校验（含二维码可扫描性校验）
 npm run preview         # 打开 http://localhost:4173/Yoko/
 ```
 
@@ -53,8 +56,26 @@ npm run preview         # 打开 http://localhost:4173/Yoko/
 
 - `dist/<slug>/index.html` —— 用户页面
 - `dist/index.html` —— `site.json` 中 `primary` 指定用户的页面（站点首页）
+- `build/qr/<slug>.png`、`build/qr/<slug>.svg` —— 该用户页面的水墨风分享
+  二维码（只进 Release，**不会**进入 `dist/`，页面也从不引用它）
 
 `dist/` 与本地构建缓存都不会提交到仓库。
+
+## 二维码分享卡片
+
+每个用户的「进入网页」二维码以水墨卡片形式生成（宣纸底色、朱砂印章、毛笔
+字标），可作为分享图。它自动随 tag 发布到对应 Release：
+
+- 推一个与用户文件夹同名的 tag（如 `git tag Yoko && git push origin Yoko`），
+  触发 `.github/workflows/release-qr.yml`：构建 → `npm run check` 校验 →
+  创建/更新该 tag 的 Release 并上传 `<slug>.png` 与 `<slug>.svg`。
+- 也可以在 Actions 里手动运行该工作流，输入 tag 名。
+- 每次运行都会把 Release 重新指向 tag 当前所在的提交，并替换同名资产，重跑幂等。
+
+二维码的点阵是干净的整格方块，保证任意尺寸、手机相机、以及 CI 里的
+jsQR/ZBar 都能扫出；水墨风格体现在卡片外围（纸纹、云墨、边角飞白、印章、
+毛笔字标）而不是扭曲承载数据的点阵。`npm run check` 会在多个分辨率下解码
+校验，点阵一旦扫不出即构建失败。
 
 ## 站点配置 `site.json`
 
